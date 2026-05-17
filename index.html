@@ -1,0 +1,670 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Our Shared Space</title>
+    <style>
+        :root {
+            --bg-primary: #0f172a;
+            --bg-secondary: #1e293b;
+            --bg-tertiary: #334155;
+            --text-main: #f8fafc;
+            --text-muted: #94a3b8;
+            --accent: #6366f1;
+            --accent-hover: #4f46e5;
+            --success: #10b981;
+            --danger: #ef4444;
+            --border-radius: 12px;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        body {
+            background-color: var(--bg-primary);
+            color: var(--text-main);
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: flex-start;
+            padding: 12px;
+        }
+
+        .dashboard {
+            display: grid;
+            grid-template-columns: 320px 1fr;
+            gap: 20px;
+            width: 100%;
+            max-width: 1200px;
+            margin: auto;
+        }
+
+        .sidebar {
+            background-color: var(--bg-secondary);
+            border-radius: var(--border-radius);
+            padding: 20px;
+            display: flex;
+            flex-direction: column;
+            gap: 24px;
+            border: 1px solid #475569;
+        }
+
+        .section-title {
+            font-size: 1.05rem;
+            margin-bottom: 12px;
+            color: var(--text-main);
+            border-bottom: 2px solid var(--bg-tertiary);
+            padding-bottom: 8px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .status-banner {
+            font-size: 0.8rem;
+            padding: 6px 12px;
+            border-radius: 8px;
+            background: var(--bg-primary);
+            color: var(--text-muted);
+            text-align: center;
+            border: 1px solid var(--bg-tertiary);
+            font-weight: 500;
+        }
+        .status-banner.online { color: var(--success); border-color: var(--success); }
+
+        .input-stack {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+
+        .habit-input-group {
+            display: flex;
+            gap: 8px;
+        }
+
+        input[type="text"] {
+            flex: 1;
+            background-color: var(--bg-primary);
+            border: 1px solid var(--bg-tertiary);
+            color: var(--text-main);
+            padding: 10px 14px;
+            border-radius: 8px;
+            outline: none;
+            font-size: 0.9rem;
+            min-width: 0;
+        }
+
+        input[type="text"]:focus {
+            border-color: var(--accent);
+        }
+
+        button {
+            background-color: var(--accent);
+            color: white;
+            border: none;
+            padding: 10px 16px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: 600;
+            transition: background 0.2s;
+            white-space: nowrap;
+        }
+
+        button:hover {
+            background-color: var(--accent-hover);
+        }
+
+        .habit-list {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+
+        .habit-item {
+            background-color: var(--bg-primary);
+            padding: 12px;
+            border-radius: 8px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border: 1px solid var(--bg-tertiary);
+            gap: 8px;
+        }
+
+        .habit-info {
+            display: flex;
+            flex-direction: column;
+            gap: 4px;
+            min-width: 0;
+        }
+
+        .habit-name {
+            font-weight: 500;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+        }
+
+        .habit-author {
+            font-size: 0.75rem;
+            color: var(--accent);
+        }
+
+        .habit-streak {
+            font-size: 0.8rem;
+            color: var(--text-muted);
+        }
+
+        .habit-actions {
+            display: flex;
+            gap: 8px;
+            align-items: center;
+            flex-shrink: 0;
+        }
+
+        .btn-check {
+            background-color: var(--bg-tertiary);
+            padding: 6px 12px;
+            font-size: 0.8rem;
+        }
+        .btn-check.completed {
+            background-color: var(--success);
+        }
+
+        .btn-delete {
+            background-color: transparent;
+            color: var(--danger);
+            padding: 6px;
+        }
+
+        /* Calendar Styles */
+        .main-panel {
+            background-color: var(--bg-secondary);
+            border-radius: var(--border-radius);
+            padding: 20px;
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+            border: 1px solid #475569;
+        }
+
+        .calendar-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .calendar-header h2 { font-size: 1.3rem; }
+        .calendar-nav { display: flex; gap: 6px; }
+        .calendar-nav button { padding: 8px 12px; font-size: 0.85rem; }
+
+        .calendar-grid {
+            display: grid;
+            grid-template-columns: repeat(7, 1fr);
+            gap: 6px;
+        }
+
+        .weekday {
+            text-align: center;
+            font-weight: 600;
+            color: var(--text-muted);
+            padding-bottom: 4px;
+            font-size: 0.85rem;
+        }
+
+        .calendar-day {
+            background-color: var(--bg-primary);
+            border-radius: 8px;
+            padding: 8px;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            cursor: pointer;
+            border: 1px solid var(--bg-tertiary);
+            transition: transform 0.1s, border-color 0.2s;
+            min-height: 85px;
+        }
+
+        .calendar-day:hover { border-color: var(--accent); transform: translateY(-2px); }
+        .calendar-day.empty { background-color: transparent; border: none; cursor: default; pointer-events: none; }
+        .calendar-day.today { border: 2px solid var(--accent); }
+        .calendar-day.selected { background-color: #312e81; border-color: var(--accent); }
+
+        .day-number { font-weight: 600; font-size: 0.95rem; }
+        .day-badges { display: flex; flex-wrap: wrap; gap: 4px; margin-top: 4px; }
+        .badge { width: 8px; height: 8px; border-radius: 50%; display: inline-block; }
+        .badge.task { background-color: var(--accent); }
+        .badge.done { background-color: var(--success); }
+
+        /* Planner Work Area */
+        .planner-section {
+            border-top: 1px solid var(--bg-tertiary);
+            padding-top: 20px;
+            display: flex;
+            flex-direction: column;
+            gap: 16px;
+            min-height: 200px;
+        }
+
+        .planner-header { display: flex; flex-direction: column; gap: 12px; }
+        @media (min-width: 600px) {
+            .planner-header { flex-direction: row; justify-content: space-between; align-items: center; }
+        }
+
+        .planner-header h3 { font-size: 1.1rem; }
+
+        .task-list { display: flex; flex-direction: column; gap: 8px; }
+
+        .task-item {
+            background-color: var(--bg-primary);
+            padding: 12px 14px;
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            border: 1px solid var(--bg-tertiary);
+            gap: 12px;
+        }
+
+        .task-content { display: flex; align-items: center; gap: 12px; min-width: 0; }
+        .task-text { font-size: 0.95rem; word-break: break-word; }
+        .task-text.completed { text-decoration: line-through; color: var(--text-muted); }
+        .task-user { color: var(--accent); font-weight: 600; font-size: 0.85rem; margin-right: 4px; }
+
+        .checkbox {
+            width: 20px;
+            height: 20px;
+            cursor: pointer;
+            accent-color: var(--accent);
+            flex-shrink: 0;
+        }
+
+        @media (max-width: 768px) {
+            body { padding: 8px; }
+            .dashboard { grid-template-columns: 1fr; gap: 16px; }
+            .sidebar { order: 2; }
+            .main-panel { order: 1; padding: 14px; }
+            .calendar-day { min-height: 65px; padding: 6px; }
+            .day-number { font-size: 0.85rem; }
+            .calendar-header h2 { font-size: 1.15rem; }
+            .calendar-nav button { padding: 6px 10px; font-size: 0.8rem; }
+        }
+    </style>
+</head>
+<body>
+
+    <div class="dashboard">
+        <aside class="sidebar">
+            <!-- Simplified Profile Tracking -->
+            <div>
+                <h2 class="section-title">Your Profile</h2>
+                <div class="input-stack">
+                    <input type="text" id="sync-user-name" placeholder="Type your name here...">
+                </div>
+            </div>
+
+            <!-- Network Diagnostic Display -->
+            <div id="status-display" class="status-banner">Connecting to vault...</div>
+
+            <!-- Collective Habits Section -->
+            <div>
+                <h2 class="section-title">Our Daily Habits</h2>
+                <div class="habit-input-group" id="habit-form" style="display: none;">
+                    <input type="text" id="new-habit-input" placeholder="Add a shared habit...">
+                    <button id="add-habit-btn">Add</button>
+                </div>
+                <p id="habit-warn" style="color: var(--text-muted); font-size: 0.85rem;">Enter your name above to unlock habits.</p>
+            </div>
+            <div class="habit-list" id="habits-container"></div>
+        </aside>
+
+        <main class="main-panel">
+            <div class="calendar-header">
+                <h2 id="calendar-month-year">May 2026</h2>
+                <div class="calendar-nav">
+                    <button id="prev-month-btn">&lt;</button>
+                    <button id="today-btn">Today</button>
+                    <button id="next-month-btn">&gt;</button>
+                </div>
+            </div>
+
+            <div class="calendar-grid" id="calendar-matrix">
+                <div class="weekday">Sun</div><div class="weekday">Mon</div><div class="weekday">Tue</div>
+                <div class="weekday">Wed</div><div class="weekday">Thu</div><div class="weekday">Fri</div><div class="weekday">Sat</div>
+            </div>
+
+            <section class="planner-section">
+                <div class="planner-header">
+                    <h3 id="focused-date-label">Select a date</h3>
+                    <div class="habit-input-group" id="task-form" style="display: none;">
+                        <input type="text" id="new-task-input" placeholder="Add a date plan or reminder...">
+                        <button id="add-task-btn">Add Plan</button>
+                    </div>
+                </div>
+                <div class="task-list" id="tasks-container"></div>
+            </section>
+        </main>
+    </div>
+
+    <script>
+        // --- Core Internal States ---
+        let currentDate = new Date();
+        let selectedDateStr = "";
+        let userName = localStorage.getItem('ultra_sync_name_v3') || "";
+
+        let dataStore = { tasks: {}, habits: [] };
+        const months = ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"];
+
+        // --- Permanent High-Uptime Direct Global Database Route ---
+        const CLOUD_URL = "https://kvdb.io/A9vY7Xw8S489Y7gS8mS8zX/couple_space_vault_2026_prod";
+
+        // --- DOM Selectors ---
+        const monthYearLabel = document.getElementById('calendar-month-year');
+        const calendarMatrix = document.getElementById('calendar-matrix');
+        const habitsContainer = document.getElementById('habits-container');
+        const tasksContainer = document.getElementById('tasks-container');
+        const focusedDateLabel = document.getElementById('focused-date-label');
+        const taskForm = document.getElementById('task-form');
+        const habitForm = document.getElementById('habit-form');
+        const habitWarn = document.getElementById('habit-warn');
+        const statusDisplay = document.getElementById('status-display');
+        const userInput = document.getElementById('sync-user-name');
+
+        if(userName) {
+            userInput.value = userName;
+            toggleFormVisibility(true);
+        }
+
+        function toggleFormVisibility(show) {
+            if(show && userName.trim() !== "") {
+                taskForm.style.display = 'flex';
+                habitForm.style.display = 'flex';
+                habitWarn.style.display = 'none';
+            } else {
+                taskForm.style.display = 'none';
+                habitForm.style.display = 'none';
+                habitWarn.style.display = 'block';
+            }
+        }
+
+        // --- High-Reliability Sync Drivers ---
+        async function pushToCloud() {
+            try {
+                statusDisplay.innerText = "Saving changes...";
+                const response = await fetch(CLOUD_URL, {
+                    method: 'POST',
+                    body: JSON.stringify(dataStore)
+                });
+                if(response.ok) {
+                    statusDisplay.innerText = "❤️ Connected & Synced";
+                    statusDisplay.className = "status-banner online";
+                }
+            } catch (e) {
+                statusDisplay.innerText = "Connecting...";
+                statusDisplay.className = "status-banner";
+            }
+        }
+
+        async function fetchFromCloud() {
+            try {
+                const res = await fetch(CLOUD_URL);
+                if (res.ok) {
+                    const txt = await res.text();
+                    if (txt && txt.trim() !== "") {
+                        const cloudData = JSON.parse(txt);
+                        if (cloudData && (cloudData.tasks || cloudData.habits)) {
+                            dataStore = cloudData;
+                            renderCalendar();
+                            renderTasks();
+                            renderHabits();
+                        }
+                    }
+                    statusDisplay.innerText = "❤️ Connected & Synced";
+                    statusDisplay.className = "status-banner online";
+                }
+            } catch (e) {
+                statusDisplay.innerText = "Searching for sync...";
+                statusDisplay.className = "status-banner";
+            }
+        }
+
+        function formatDateString(year, month, day) {
+            return `${year}-${String(month + 1).padStart(2, '0')}-${String(day).padStart(2, '0')}`;
+        }
+
+        // --- Canvas Rendering Engines ---
+        function renderCalendar() {
+            const year = currentDate.getFullYear();
+            const month = currentDate.getMonth();
+            monthYearLabel.innerText = `${months[month]} ${year}`;
+
+            const weekdays = calendarMatrix.querySelectorAll('.weekday');
+            calendarMatrix.innerHTML = '';
+            weekdays.forEach(day => calendarMatrix.appendChild(day));
+
+            const firstDayIndex = new Date(year, month, 1).getDay();
+            const totalDays = new Date(year, month + 1, 0).getDate();
+            const today = new Date();
+
+            for (let i = 0; i < firstDayIndex; i++) {
+                const emptyDiv = document.createElement('div');
+                emptyDiv.classList.add('calendar-day', 'empty');
+                calendarMatrix.appendChild(emptyDiv);
+            }
+
+            for (let day = 1; day <= totalDays; day++) {
+                const dayDiv = document.createElement('div');
+                dayDiv.classList.add('calendar-day');
+                const dateStr = formatDateString(year, month, day);
+                dayDiv.dataset.date = dateStr;
+
+                if (today.getDate() === day && today.getMonth() === month && today.getFullYear() === year) dayDiv.classList.add('today');
+                if (selectedDateStr === dateStr) dayDiv.classList.add('selected');
+
+                const numSpan = document.createElement('span');
+                numSpan.classList.add('day-number');
+                numSpan.innerText = day;
+                dayDiv.appendChild(numSpan);
+
+                const badgesDiv = document.createElement('div');
+                badgesDiv.classList.add('day-badges');
+                const dayTasks = dataStore.tasks[dateStr] || [];
+                if (dayTasks.length > 0) {
+                    const hasPending = dayTasks.some(t => !t.completed);
+                    const badge = document.createElement('span');
+                    badge.classList.add('badge', hasPending ? 'task' : 'done');
+                    badgesDiv.appendChild(badge);
+                }
+                dayDiv.appendChild(badgesDiv);
+
+                dayDiv.addEventListener('click', () => selectDate(dateStr));
+                calendarMatrix.appendChild(dayDiv);
+            }
+        }
+
+        function selectDate(dateStr) {
+            selectedDateStr = dateStr;
+            document.querySelectorAll('.calendar-day').forEach(node => {
+                node.classList.remove('selected');
+                if(node.dataset.date === dateStr) node.classList.add('selected');
+            });
+
+            const [y, m, d] = dateStr.split('-');
+            focusedDateLabel.innerText = `Plans: ${months[parseInt(m)-1]} ${parseInt(d)}, ${y}`;
+            toggleFormVisibility(true);
+            renderTasks();
+        }
+
+        function renderTasks() {
+            tasksContainer.innerHTML = '';
+            if (!selectedDateStr) return;
+            const dayTasks = dataStore.tasks[selectedDateStr] || [];
+
+            if (dayTasks.length === 0) {
+                tasksContainer.innerHTML = `<p style="color: var(--text-muted); font-size: 0.9rem;">No plans written down for this day.</p>`;
+                return;
+            }
+
+            dayTasks.forEach(task => {
+                const item = document.createElement('div');
+                item.classList.add('task-item');
+                item.innerHTML = `
+                    <div class="task-content">
+                        <input type="checkbox" class="checkbox" ${task.completed ? 'checked' : ''}>
+                        <span class="task-text ${task.completed ? 'completed' : ''}">
+                            <span class="task-user">@${task.user}:</span>${task.text}
+                        </span>
+                    </div>
+                    <button class="btn-delete">✕</button>
+                `;
+
+                item.querySelector('.checkbox').addEventListener('change', async () => {
+                    task.completed = !task.completed;
+                    await pushToCloud();
+                    renderTasks();
+                    renderCalendar();
+                });
+
+                item.querySelector('.btn-delete').addEventListener('click', async () => {
+                    dataStore.tasks[selectedDateStr] = dayTasks.filter(t => t.id !== task.id);
+                    if(dataStore.tasks[selectedDateStr].length === 0) delete dataStore.tasks[selectedDateStr];
+                    await pushToCloud();
+                    renderTasks();
+                    renderCalendar();
+                });
+                tasksContainer.appendChild(item);
+            });
+        }
+
+        function renderHabits() {
+            habitsContainer.innerHTML = '';
+            const todayStr = formatDateString(new Date().getFullYear(), new Date().getMonth(), new Date().getDate());
+
+            if (!dataStore.habits || dataStore.habits.length === 0) {
+                habitsContainer.innerHTML = `<p style="color: var(--text-muted); font-size: 0.9rem;">No tracking routines set up yet.</p>`;
+                return;
+            }
+
+            dataStore.habits.forEach(habit => {
+                const item = document.createElement('div');
+                item.classList.add('habit-item');
+                const isCompletedToday = habit.lastCompleted === todayStr;
+
+                item.innerHTML = `
+                    <div class="habit-info">
+                        <span class="habit-name">${habit.name}</span>
+                        <span class="habit-author">Added by: ${habit.user}</span>
+                        <span class="habit-streak">⚡ Streak: ${habit.streak} days</span>
+                    </div>
+                    <div class="habit-actions">
+                        <button class="btn-check ${isCompletedToday ? 'completed' : ''}">
+                            ${isCompletedToday ? 'Done' : 'Check'}
+                        </button>
+                        <button class="btn-delete">✕</button>
+                    </div>
+                `;
+
+                item.querySelector('.btn-check').addEventListener('click', async () => {
+                    if (!isCompletedToday) {
+                        const yesterdayStr = formatDateString(new Date().getFullYear(), new Date().getMonth(), new Date().getDate() - 1);
+                        if (habit.lastCompleted === yesterdayStr) habit.streak += 1;
+                        else if (habit.lastCompleted !== todayStr) habit.streak = 1;
+                        habit.lastCompleted = todayStr;
+                    } else {
+                        habit.streak = Math.max(0, habit.streak - 1);
+                        habit.lastCompleted = "";
+                    }
+                    await pushToCloud();
+                    renderHabits();
+                });
+
+                item.querySelector('.btn-delete').addEventListener('click', async () => {
+                    dataStore.habits = dataStore.habits.filter(h => h.id !== habit.id);
+                    await pushToCloud();
+                    renderHabits();
+                });
+                habitsContainer.appendChild(item);
+            });
+        }
+
+        // --- Profile Input Tracker Listener ---
+        userInput.addEventListener('input', () => {
+            userName = userInput.value.trim();
+            localStorage.setItem('ultra_sync_name_v3', userName);
+            toggleFormVisibility(userName !== "");
+            renderTasks();
+            renderHabits();
+        });
+
+        // --- Interaction Form Triggers ---
+        document.getElementById('add-task-btn').addEventListener('click', async () => {
+            const taskInput = document.getElementById('new-task-input');
+            const text = taskInput.value.trim();
+            if (!text || !selectedDateStr || !userName) return;
+
+            if (!dataStore.tasks) dataStore.tasks = {};
+            if (!dataStore.tasks[selectedDateStr]) dataStore.tasks[selectedDateStr] = [];
+
+            dataStore.tasks[selectedDateStr].push({
+                id: Date.now(),
+                text: text,
+                user: userName,
+                completed: false
+            });
+
+            taskInput.value = '';
+            await pushToCloud();
+            renderTasks();
+            renderCalendar();
+        });
+
+        document.getElementById('add-habit-btn').addEventListener('click', async () => {
+            const habitInput = document.getElementById('new-habit-input');
+            const name = habitInput.value.trim();
+            if (!name || !userName) return;
+
+            if(!dataStore.habits) dataStore.habits = [];
+            dataStore.habits.push({
+                id: Date.now(),
+                name: name,
+                user: userName,
+                streak: 0,
+                lastCompleted: ""
+            });
+
+            habitInput.value = '';
+            await pushToCloud();
+            renderHabits();
+        });
+
+        document.getElementById('prev-month-btn').addEventListener('click', () => { currentDate.setMonth(currentDate.getMonth() - 1); renderCalendar(); });
+        document.getElementById('next-month-btn').addEventListener('click', () => { currentDate.setMonth(currentDate.getMonth() + 1); renderCalendar(); });
+        document.getElementById('today-btn').addEventListener('click', () => {
+            currentDate = new Date();
+            selectDate(formatDateString(currentDate.getFullYear(), currentDate.getMonth(), currentDate.getDate()));
+            renderCalendar();
+        });
+
+        document.getElementById('new-task-input').addEventListener('keypress', (e) => { if (e.key === 'Enter') document.getElementById('add-task-btn').click(); });
+        document.getElementById('new-habit-input').addEventListener('keypress', (e) => { if (e.key === 'Enter') document.getElementById('add-habit-btn').click(); });
+
+        // --- Core Startup Engine ---
+        renderCalendar();
+        const initialTodayStr = formatDateString(currentDate.getFullYear(), currentDate.getMonth(), currentDate.getDate());
+        selectDate(initialTodayStr);
+
+        // Run download instantly 
+        fetchFromCloud();
+        
+        // Auto background data pulse download check loop execution every 5 seconds
+        setInterval(fetchFromCloud, 5000);
+    </script>
+</body>
+</html>
