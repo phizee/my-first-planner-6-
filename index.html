@@ -3,668 +3,534 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Our Shared Space</title>
+    <title>Campus Classrooms Tidiness Evaluation System</title>
     <style>
         :root {
-            --bg-primary: #0f172a;
-            --bg-secondary: #1e293b;
-            --bg-tertiary: #334155;
-            --text-main: #f8fafc;
-            --text-muted: #94a3b8;
-            --accent: #6366f1;
-            --accent-hover: #4f46e5;
-            --success: #10b981;
-            --danger: #ef4444;
-            --border-radius: 12px;
+            --primary-bg: #f4f7f6;
+            --header-bg: #e0829d;
+            --daily-header: #c5e0b4;
+            --weekly-header: #b4c6e7;
+            --card-bg: #ffffff;
+            --border-color: #d1d5db;
+            --text-color: #2c3e50;
+            --pos-color: #27ae60;
+            --neg-color: #c0392b;
         }
 
         * {
-            margin: 0;
-            padding: 0;
             box-sizing: border-box;
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            margin: 0;
+            padding: 0;
         }
 
         body {
-            background-color: var(--bg-primary);
-            color: var(--text-main);
-            min-height: 100vh;
-            display: flex;
-            justify-content: center;
-            align-items: flex-start;
-            padding: 12px;
+            background-color: var(--primary-bg);
+            color: var(--text-color);
+            padding-bottom: 90px;
         }
 
-        .dashboard {
-            display: grid;
-            grid-template-columns: 320px 1fr;
-            gap: 20px;
-            width: 100%;
-            max-width: 1200px;
-            margin: auto;
-        }
-
-        .sidebar {
-            background-color: var(--bg-secondary);
-            border-radius: var(--border-radius);
-            padding: 20px;
-            display: flex;
-            flex-direction: column;
-            gap: 24px;
-            border: 1px solid #475569;
-        }
-
-        .section-title {
-            font-size: 1.05rem;
-            margin-bottom: 12px;
-            color: var(--text-main);
-            border-bottom: 2px solid var(--bg-tertiary);
-            padding-bottom: 8px;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-        }
-
-        .status-banner {
-            font-size: 0.8rem;
-            padding: 6px 12px;
-            border-radius: 8px;
-            background: var(--bg-primary);
-            color: var(--text-muted);
-            text-align: center;
-            border: 1px solid var(--bg-tertiary);
-            font-weight: 500;
-        }
-        .status-banner.online { color: var(--success); border-color: var(--success); }
-
-        .input-stack {
-            display: flex;
-            flex-direction: column;
-            gap: 10px;
-        }
-
-        .habit-input-group {
-            display: flex;
-            gap: 8px;
-        }
-
-        input[type="text"] {
-            flex: 1;
-            background-color: var(--bg-primary);
-            border: 1px solid var(--bg-tertiary);
-            color: var(--text-main);
-            padding: 10px 14px;
-            border-radius: 8px;
-            outline: none;
-            font-size: 0.9rem;
-            min-width: 0;
-        }
-
-        input[type="text"]:focus {
-            border-color: var(--accent);
-        }
-
-        button {
-            background-color: var(--accent);
+        .header-title {
+            background-color: var(--header-bg);
             color: white;
-            border: none;
-            padding: 10px 16px;
-            border-radius: 8px;
-            cursor: pointer;
-            font-weight: 600;
-            transition: background 0.2s;
-            white-space: nowrap;
-        }
-
-        button:hover {
-            background-color: var(--accent-hover);
-        }
-
-        .habit-list {
-            display: flex;
-            flex-direction: column;
-            gap: 12px;
-        }
-
-        .habit-item {
-            background-color: var(--bg-primary);
-            padding: 12px;
-            border-radius: 8px;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            border: 1px solid var(--bg-tertiary);
-            gap: 8px;
-        }
-
-        .habit-info {
-            display: flex;
-            flex-direction: column;
-            gap: 4px;
-            min-width: 0;
-        }
-
-        .habit-name {
-            font-weight: 500;
-            overflow: hidden;
-            text-overflow: ellipsis;
-            white-space: nowrap;
-        }
-
-        .habit-author {
-            font-size: 0.75rem;
-            color: var(--accent);
-        }
-
-        .habit-streak {
-            font-size: 0.8rem;
-            color: var(--text-muted);
-        }
-
-        .habit-actions {
-            display: flex;
-            gap: 8px;
-            align-items: center;
-            flex-shrink: 0;
-        }
-
-        .btn-check {
-            background-color: var(--bg-tertiary);
-            padding: 6px 12px;
-            font-size: 0.8rem;
-        }
-        .btn-check.completed {
-            background-color: var(--success);
-        }
-
-        .btn-delete {
-            background-color: transparent;
-            color: var(--danger);
-            padding: 6px;
-        }
-
-        /* Calendar Styles */
-        .main-panel {
-            background-color: var(--bg-secondary);
-            border-radius: var(--border-radius);
-            padding: 20px;
-            display: flex;
-            flex-direction: column;
-            gap: 20px;
-            border: 1px solid #475569;
-        }
-
-        .calendar-header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            gap: 12px;
-        }
-
-        .calendar-header h2 { font-size: 1.3rem; }
-        .calendar-nav { display: flex; gap: 6px; }
-        .calendar-nav button { padding: 8px 12px; font-size: 0.85rem; }
-
-        .calendar-grid {
-            display: grid;
-            grid-template-columns: repeat(7, 1fr);
-            gap: 6px;
-        }
-
-        .weekday {
             text-align: center;
-            font-weight: 600;
-            color: var(--text-muted);
-            padding-bottom: 4px;
+            padding: 20px 10px;
+            font-size: 1.5rem;
+            font-weight: bold;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+        }
+
+        .container {
+            max-width: 800px;
+            margin: 20px auto;
+            padding: 0 15px;
+        }
+
+        .meta-card {
+            background: var(--card-bg);
+            padding: 15px;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+            margin-bottom: 20px;
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 15px;
+        }
+
+        .meta-group {
+            display: flex;
+            flex-direction: column;
+        }
+
+        .meta-group label {
+            font-size: 0.85rem;
+            font-weight: bold;
+            margin-bottom: 5px;
+            color: #555;
+        }
+
+        .meta-group input {
+            padding: 8px;
+            border: 1px solid var(--border-color);
+            border-radius: 4px;
+            font-size: 0.95rem;
+        }
+
+        .section-header {
+            padding: 10px 15px;
+            font-weight: bold;
+            font-size: 1.1rem;
+            border-radius: 6px;
+            margin: 25px 0 15px 0;
+        }
+
+        .daily-sec { background-color: var(--daily-header); color: #2e5b1e; }
+        .weekly-sec { background-color: var(--weekly-header); color: #1f3864; }
+
+        .category-card {
+            background: var(--card-bg);
+            border-radius: 8px;
+            padding: 15px;
+            margin-bottom: 15px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+            border: 1px solid var(--border-color);
+        }
+
+        .category-title {
+            font-size: 1rem;
+            font-weight: bold;
+            margin-bottom: 12px;
+            border-bottom: 2px solid #f0f0f0;
+            padding-bottom: 5px;
+        }
+
+        .option-item {
+            display: flex;
+            align-items: center;
+            padding: 10px;
+            margin-bottom: 6px;
+            border-radius: 6px;
+            border: 1px solid #efefef;
+            cursor: pointer;
+            transition: background 0.2s;
+        }
+
+        .option-item:hover {
+            background-color: #f8f9fa;
+        }
+
+        .option-item input[type="radio"] {
+            margin-right: 12px;
+            width: 18px;
+            height: 18px;
+            cursor: pointer;
+        }
+
+        .badge {
+            font-weight: bold;
+            padding: 3px 8px;
+            border-radius: 4px;
+            margin-right: 10px;
+            min-width: 35px;
+            text-align: center;
             font-size: 0.85rem;
         }
 
-        .calendar-day {
-            background-color: var(--bg-primary);
-            border-radius: 8px;
-            padding: 8px;
+        .points-pos { background-color: #d4edda; color: #155724; }
+        .points-neu { background-color: #e2e3e5; color: #383d41; }
+        .points-neg { background-color: #f8d7da; color: #721c24; }
+
+        .option-text {
+            font-size: 0.9rem;
+            line-height: 1.3;
+        }
+
+        /* Fixed Footer for Live Score */
+        .score-bar {
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            background: #ffffff;
+            border-top: 2px solid var(--border-color);
+            padding: 12px 20px;
             display: flex;
-            flex-direction: column;
             justify-content: space-between;
-            cursor: pointer;
-            border: 1px solid var(--bg-tertiary);
-            transition: transform 0.1s, border-color 0.2s;
-            min-height: 85px;
-        }
-
-        .calendar-day:hover { border-color: var(--accent); transform: translateY(-2px); }
-        .calendar-day.empty { background-color: transparent; border: none; cursor: default; pointer-events: none; }
-        .calendar-day.today { border: 2px solid var(--accent); }
-        .calendar-day.selected { background-color: #312e81; border-color: var(--accent); }
-
-        .day-number { font-weight: 600; font-size: 0.95rem; }
-        .day-badges { display: flex; flex-wrap: wrap; gap: 4px; margin-top: 4px; }
-        .badge { width: 8px; height: 8px; border-radius: 50%; display: inline-block; }
-        .badge.task { background-color: var(--accent); }
-        .badge.done { background-color: var(--success); }
-
-        /* Planner Work Area */
-        .planner-section {
-            border-top: 1px solid var(--bg-tertiary);
-            padding-top: 20px;
-            display: flex;
-            flex-direction: column;
-            gap: 16px;
-            min-height: 200px;
-        }
-
-        .planner-header { display: flex; flex-direction: column; gap: 12px; }
-        @media (min-width: 600px) {
-            .planner-header { flex-direction: row; justify-content: space-between; align-items: center; }
-        }
-
-        .planner-header h3 { font-size: 1.1rem; }
-
-        .task-list { display: flex; flex-direction: column; gap: 8px; }
-
-        .task-item {
-            background-color: var(--bg-primary);
-            padding: 12px 14px;
-            border-radius: 8px;
-            display: flex;
             align-items: center;
-            justify-content: space-between;
-            border: 1px solid var(--bg-tertiary);
-            gap: 12px;
+            box-shadow: 0 -2px 10px rgba(0,0,0,0.1);
+            z-index: 1000;
         }
 
-        .task-content { display: flex; align-items: center; gap: 12px; min-width: 0; }
-        .task-text { font-size: 0.95rem; word-break: break-word; }
-        .task-text.completed { text-decoration: line-through; color: var(--text-muted); }
-        .task-user { color: var(--accent); font-weight: 600; font-size: 0.85rem; margin-right: 4px; }
+        .score-display {
+            font-size: 1.2rem;
+            font-weight: bold;
+        }
 
-        .checkbox {
-            width: 20px;
-            height: 20px;
+        .total-number {
+            font-size: 1.5rem;
+            margin-left: 5px;
+        }
+
+        .btn {
+            background-color: #3498db;
+            color: white;
+            border: none;
+            padding: 10px 18px;
+            border-radius: 5px;
+            font-weight: bold;
             cursor: pointer;
-            accent-color: var(--accent);
-            flex-shrink: 0;
+            transition: background 0.2s;
         }
 
-        @media (max-width: 768px) {
-            body { padding: 8px; }
-            .dashboard { grid-template-columns: 1fr; gap: 16px; }
-            .sidebar { order: 2; }
-            .main-panel { order: 1; padding: 14px; }
-            .calendar-day { min-height: 65px; padding: 6px; }
-            .day-number { font-size: 0.85rem; }
-            .calendar-header h2 { font-size: 1.15rem; }
-            .calendar-nav button { padding: 6px 10px; font-size: 0.8rem; }
+        .btn:hover { background-color: #2980b9; }
+        .btn-reset { background-color: #e74c3c; margin-right: 8px; }
+        .btn-reset:hover { background-color: #c0392b; }
+
+        /* Report Modal */
+        .modal {
+            display: none;
+            position: fixed;
+            top:0; left:0; width:100%; height:100%;
+            background: rgba(0,0,0,0.5);
+            justify-content: center;
+            align-items: center;
+            z-index: 2000;
+        }
+
+        .modal-content {
+            background: white;
+            padding: 20px;
+            border-radius: 8px;
+            max-width: 500px;
+            width: 90%;
+            max-height: 80vh;
+            overflow-y: auto;
+        }
+
+        textarea {
+            width: 100%;
+            height: 200px;
+            margin-top: 10px;
+            padding: 10px;
+            font-family: monospace;
+        }
+
+        @media (max-width: 600px) {
+            .header-title { font-size: 1.2rem; }
+            .score-display { font-size: 1rem; }
+            .total-number { font-size: 1.2rem; }
         }
     </style>
 </head>
 <body>
 
-    <div class="dashboard">
-        <aside class="sidebar">
-            <!-- Simplified Profile Tracking -->
-            <div>
-                <h2 class="section-title">Your Profile</h2>
-                <div class="input-stack">
-                    <input type="text" id="sync-user-name" placeholder="Type your name here...">
-                </div>
+    <div class="header-title">
+        Campus Classrooms Tidiness Evaluation System
+    </div>
+
+    <div class="container">
+        <!-- Metadata Form -->
+        <div class="meta-card">
+            <div class="meta-group">
+                <label for="roomNum">Classroom / Section:</label>
+                <input type="text" id="roomNum" placeholder="e.g. Room 101 / Grade 10-A">
+            </div>
+            <div class="meta-group">
+                <label for="evaluator">Evaluator / Inspector Name:</label>
+                <input type="text" id="evaluator" placeholder="Officer Name">
+            </div>
+            <div class="meta-group">
+                <label for="evalDate">Evaluation Date:</label>
+                <input type="date" id="evalDate">
+            </div>
+        </div>
+
+        <form id="evaluationForm">
+
+            <!-- DAILY EVALUATION -->
+            <div class="section-header daily-sec">Daily Evaluation Bases</div>
+
+            <!-- Floor Cleanliness -->
+            <div class="category-card">
+                <div class="category-title">Floor Cleanliness</div>
+                <label class="option-item">
+                    <input type="radio" name="floor" value="3" onchange="calculateScore()">
+                    <span class="badge points-pos">+3</span>
+                    <span class="option-text">Classroom floor is spotless, no marks, and no dust.</span>
+                </label>
+                <label class="option-item">
+                    <input type="radio" name="floor" value="1" onchange="calculateScore()">
+                    <span class="badge points-pos">+1</span>
+                    <span class="option-text">Classroom floor is moderately clean, with minimal clutter.</span>
+                </label>
+                <label class="option-item">
+                    <input type="radio" name="floor" value="-5" onchange="calculateScore()">
+                    <span class="badge points-neg">-5</span>
+                    <span class="option-text">Classroom floor is dirty. Presence of dirt and clutter is shown.</span>
+                </label>
+                <label class="option-item">
+                    <input type="radio" name="floor" value="-7" onchange="calculateScore()">
+                    <span class="badge points-neg">-7</span>
+                    <span class="option-text">Classroom floor is very dirty. Profusion of clutter and stains are present.</span>
+                </label>
             </div>
 
-            <!-- Network Diagnostic Display -->
-            <div id="status-display" class="status-banner">Connecting to vault...</div>
-
-            <!-- Collective Habits Section -->
-            <div>
-                <h2 class="section-title">Our Daily Habits</h2>
-                <div class="habit-input-group" id="habit-form" style="display: none;">
-                    <input type="text" id="new-habit-input" placeholder="Add a shared habit...">
-                    <button id="add-habit-btn">Add</button>
-                </div>
-                <p id="habit-warn" style="color: var(--text-muted); font-size: 0.85rem;">Enter your name above to unlock habits.</p>
-            </div>
-            <div class="habit-list" id="habits-container"></div>
-        </aside>
-
-        <main class="main-panel">
-            <div class="calendar-header">
-                <h2 id="calendar-month-year">May 2026</h2>
-                <div class="calendar-nav">
-                    <button id="prev-month-btn">&lt;</button>
-                    <button id="today-btn">Today</button>
-                    <button id="next-month-btn">&gt;</button>
-                </div>
+            <!-- Classroom Organized -->
+            <div class="category-card">
+                <div class="category-title">Classroom Organized</div>
+                <label class="option-item">
+                    <input type="radio" name="organized" value="2" onchange="calculateScore()">
+                    <span class="badge points-pos">+2</span>
+                    <span class="option-text">Chairs and tables are organized and aligned neatly.</span>
+                </label>
+                <label class="option-item">
+                    <input type="radio" name="organized" value="0" onchange="calculateScore()">
+                    <span class="badge points-neu">0</span>
+                    <span class="option-text">One to two chairs or tables are not aligned.</span>
+                </label>
+                <label class="option-item">
+                    <input type="radio" name="organized" value="-5" onchange="calculateScore()">
+                    <span class="badge points-neg">-5</span>
+                    <span class="option-text">More than two chairs and tables are not organized and aligned.</span>
+                </label>
             </div>
 
-            <div class="calendar-grid" id="calendar-matrix">
-                <div class="weekday">Sun</div><div class="weekday">Mon</div><div class="weekday">Tue</div>
-                <div class="weekday">Wed</div><div class="weekday">Thu</div><div class="weekday">Fri</div><div class="weekday">Sat</div>
+            <!-- Classroom Whiteboard -->
+            <div class="category-card">
+                <div class="category-title">Classroom Whiteboard</div>
+                <label class="option-item">
+                    <input type="radio" name="whiteboard" value="2" onchange="calculateScore()">
+                    <span class="badge points-pos">+2</span>
+                    <span class="option-text">Classroom whiteboard is fully clean excluding written classroom notes, date, and other important writings.</span>
+                </label>
+                <label class="option-item">
+                    <input type="radio" name="whiteboard" value="0" onchange="calculateScore()">
+                    <span class="badge points-neu">0</span>
+                    <span class="option-text">Classroom whiteboard is clear from previous lectures, but can be cleaner.</span>
+                </label>
+                <label class="option-item">
+                    <input type="radio" name="whiteboard" value="-5" onchange="calculateScore()">
+                    <span class="badge points-neg">-5</span>
+                    <span class="option-text">Classroom whiteboard is dirty and previous lectures and text are present.</span>
+                </label>
             </div>
 
-            <section class="planner-section">
-                <div class="planner-header">
-                    <h3 id="focused-date-label">Select a date</h3>
-                    <div class="habit-input-group" id="task-form" style="display: none;">
-                        <input type="text" id="new-task-input" placeholder="Add a date plan or reminder...">
-                        <button id="add-task-btn">Add Plan</button>
-                    </div>
-                </div>
-                <div class="task-list" id="tasks-container"></div>
-            </section>
-        </main>
+            <!-- Classroom Trash Bin -->
+            <div class="category-card">
+                <div class="category-title">Classroom Trash Bin</div>
+                <label class="option-item">
+                    <input type="radio" name="trash" value="3" onchange="calculateScore()">
+                    <span class="badge points-pos">+3</span>
+                    <span class="option-text">Classroom trash bin is empty but with a trash bag.</span>
+                </label>
+                <label class="option-item">
+                    <input type="radio" name="trash" value="2" onchange="calculateScore()">
+                    <span class="badge points-pos">+2</span>
+                    <span class="option-text">Classroom trash bin is empty but without a trash bag.</span>
+                </label>
+                <label class="option-item">
+                    <input type="radio" name="trash" value="1" onchange="calculateScore()">
+                    <span class="badge points-pos">+1</span>
+                    <span class="option-text">Classroom trash bin has little trash inside, no more than half its maximum capacity.</span>
+                </label>
+                <label class="option-item">
+                    <input type="radio" name="trash" value="-5" onchange="calculateScore()">
+                    <span class="badge points-neg">-5</span>
+                    <span class="option-text">Classroom trash bin has trash, more than half its maximum capacity.</span>
+                </label>
+            </div>
+
+            <!-- Classroom Cleaners -->
+            <div class="category-card">
+                <div class="category-title">Classroom Cleaners</div>
+                <label class="option-item">
+                    <input type="radio" name="cleaners" value="3" onchange="calculateScore()">
+                    <span class="badge points-pos">+3</span>
+                    <span class="option-text">All classroom cleaners are present/cleaned. (Ask Class President/Cleaners)</span>
+                </label>
+                <label class="option-item">
+                    <input type="radio" name="cleaners" value="0" onchange="calculateScore()">
+                    <span class="badge points-neu">0</span>
+                    <span class="option-text">Some classroom cleaners did not fulfill their duties excluding those with valid reasons.</span>
+                </label>
+                <label class="option-item">
+                    <input type="radio" name="cleaners" value="-7" onchange="calculateScore()">
+                    <span class="badge points-neg">-7</span>
+                    <span class="option-text">The classroom was not cleaned by the classroom cleaners.</span>
+                </label>
+            </div>
+
+            <!-- WEEKLY EVALUATION -->
+            <div class="section-header weekly-sec">Weekly Evaluation Bases (Evaluated every Sunday)</div>
+
+            <!-- Classroom Cleaners List -->
+            <div class="category-card">
+                <div class="category-title">Classroom Cleaners List</div>
+                <label class="option-item">
+                    <input type="radio" name="cleanersList" value="2" onchange="calculateScore()">
+                    <span class="badge points-pos">+2</span>
+                    <span class="option-text">Classroom has posted cleaners list for each day present.</span>
+                </label>
+                <label class="option-item">
+                    <input type="radio" name="cleanersList" value="-5" onchange="calculateScore()">
+                    <span class="badge points-neg">-5</span>
+                    <span class="option-text">Classroom has no posted cleaners list for each day present.</span>
+                </label>
+            </div>
+
+            <!-- Cleaning Equipment -->
+            <div class="category-card">
+                <div class="category-title">Cleaning Equipment</div>
+                <label class="option-item">
+                    <input type="radio" name="equipment" value="2" onchange="calculateScore()">
+                    <span class="badge points-pos">+2</span>
+                    <span class="option-text">Classroom has cleaning equipment sufficient for cleaners of the day. (e.g. 4 cleaners = 2-3 brooms & dustpans)</span>
+                </label>
+                <label class="option-item">
+                    <input type="radio" name="equipment" value="0" onchange="calculateScore()">
+                    <span class="badge points-neu">0</span>
+                    <span class="option-text">Classroom has cleaning equipment but insufficient for cleaners of the day. (e.g. 4 cleaners = 1 broom & dustpan)</span>
+                </label>
+                <label class="option-item">
+                    <input type="radio" name="equipment" value="-5" onchange="calculateScore()">
+                    <span class="badge points-neg">-5</span>
+                    <span class="option-text">Classroom has no cleaning equipment (brooms, dustpans, etc.) present.</span>
+                </label>
+            </div>
+
+            <!-- Classroom Decoration -->
+            <div class="category-card">
+                <div class="category-title">Classroom Decoration</div>
+                <label class="option-item">
+                    <input type="radio" name="decoration" value="3" onchange="calculateScore()">
+                    <span class="badge points-pos">+3</span>
+                    <span class="option-text">Classroom is well decorated.</span>
+                </label>
+                <label class="option-item">
+                    <input type="radio" name="decoration" value="2" onchange="calculateScore()">
+                    <span class="badge points-pos">+2</span>
+                    <span class="option-text">Classroom is moderately decorated.</span>
+                </label>
+                <label class="option-item">
+                    <input type="radio" name="decoration" value="1" onchange="calculateScore()">
+                    <span class="badge points-pos">+1</span>
+                    <span class="option-text">Classroom has minimal decoration.</span>
+                </label>
+                <label class="option-item">
+                    <input type="radio" name="decoration" value="0" onchange="calculateScore()">
+                    <span class="badge points-neu">0</span>
+                    <span class="option-text">Classroom has no decorations.</span>
+                </label>
+            </div>
+
+        </form>
+    </div>
+
+    <!-- Sticky Score Bottom Bar -->
+    <div class="score-bar">
+        <div class="score-display">
+            Total Score: <span id="totalScore" class="total-number" style="color: #2c3e50;">0</span>
+        </div>
+        <div>
+            <button class="btn btn-reset" onclick="resetForm()">Reset</button>
+            <button class="btn" onclick="generateReport()">Summary Report</button>
+        </div>
+    </div>
+
+    <!-- Summary Modal -->
+    <div id="reportModal" class="modal">
+        <div class="modal-content">
+            <h3>Inspection Summary</h3>
+            <textarea id="reportText" readonly></textarea>
+            <br><br>
+            <button class="btn" onclick="copyReport()">Copy Report</button>
+            <button class="btn btn-reset" onclick="closeModal()">Close</button>
+        </div>
     </div>
 
     <script>
-        // --- Core Internal States ---
-        let currentDate = new Date();
-        let selectedDateStr = "";
-        let userName = localStorage.getItem('ultra_sync_name_v3') || "";
+        // Set today's date automatically
+        document.getElementById('evalDate').valueAsDate = new Date();
 
-        let dataStore = { tasks: {}, habits: [] };
-        const months = ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"];
+        function calculateScore() {
+            let total = 0;
+            const form = document.getElementById('evaluationForm');
+            const formData = new FormData(form);
 
-        // --- Permanent High-Uptime Direct Global Database Route ---
-        const CLOUD_URL = "https://kvdb.io/A9vY7Xw8S489Y7gS8mS8zX/couple_space_vault_2026_prod";
+            for (let value of formData.values()) {
+                total += parseInt(value, 10);
+            }
 
-        // --- DOM Selectors ---
-        const monthYearLabel = document.getElementById('calendar-month-year');
-        const calendarMatrix = document.getElementById('calendar-matrix');
-        const habitsContainer = document.getElementById('habits-container');
-        const tasksContainer = document.getElementById('tasks-container');
-        const focusedDateLabel = document.getElementById('focused-date-label');
-        const taskForm = document.getElementById('task-form');
-        const habitForm = document.getElementById('habit-form');
-        const habitWarn = document.getElementById('habit-warn');
-        const statusDisplay = document.getElementById('status-display');
-        const userInput = document.getElementById('sync-user-name');
+            const totalScoreElem = document.getElementById('totalScore');
+            totalScoreElem.textContent = (total > 0 ? '+' : '') + total;
 
-        if(userName) {
-            userInput.value = userName;
-            toggleFormVisibility(true);
-        }
-
-        function toggleFormVisibility(show) {
-            if(show && userName.trim() !== "") {
-                taskForm.style.display = 'flex';
-                habitForm.style.display = 'flex';
-                habitWarn.style.display = 'none';
+            if (total > 0) {
+                totalScoreElem.style.color = '#27ae60';
+            } else if (total < 0) {
+                totalScoreElem.style.color = '#c0392b';
             } else {
-                taskForm.style.display = 'none';
-                habitForm.style.display = 'none';
-                habitWarn.style.display = 'block';
+                totalScoreElem.style.color = '#2c3e50';
             }
         }
 
-        // --- High-Reliability Sync Drivers ---
-        async function pushToCloud() {
-            try {
-                statusDisplay.innerText = "Saving changes...";
-                const response = await fetch(CLOUD_URL, {
-                    method: 'POST',
-                    body: JSON.stringify(dataStore)
-                });
-                if(response.ok) {
-                    statusDisplay.innerText = "❤️ Connected & Synced";
-                    statusDisplay.className = "status-banner online";
+        function resetForm() {
+            if (confirm("Are you sure you want to reset the form?")) {
+                document.getElementById('evaluationForm').reset();
+                calculateScore();
+            }
+        }
+
+        function generateReport() {
+            const room = document.getElementById('roomNum').value || 'Unspecified Classroom';
+            const evaluator = document.getElementById('evaluator').value || 'Unspecified Evaluator';
+            const date = document.getElementById('evalDate').value || 'N/A';
+            const score = document.getElementById('totalScore').textContent;
+
+            let report = `=== CLASSROOM TIDINESS EVALUATION REPORT ===\n`;
+            report += `Classroom/Section: ${room}\n`;
+            report += `Evaluator: ${evaluator}\n`;
+            report += `Date: ${date}\n`;
+            report += `-------------------------------------------\n`;
+            report += `TOTAL POINTS SCORE: ${score}\n`;
+            report += `-------------------------------------------\n\n`;
+            report += `Breakdown of Ratings:\n`;
+
+            const categories = [
+                { name: 'Floor Cleanliness', key: 'floor' },
+                { name: 'Classroom Organized', key: 'organized' },
+                { name: 'Classroom Whiteboard', key: 'whiteboard' },
+                { name: 'Classroom Trash Bin', key: 'trash' },
+                { name: 'Classroom Cleaners', key: 'cleaners' },
+                { name: 'Classroom Cleaners List', key: 'cleanersList' },
+                { name: 'Cleaning Equipment', key: 'equipment' },
+                { name: 'Classroom Decoration', key: 'decoration' }
+            ];
+
+            categories.forEach(cat => {
+                const selected = document.querySelector(`input[name="${cat.key}"]:checked`);
+                if (selected) {
+                    const text = selected.nextElementSibling.nextElementSibling.textContent;
+                    report += `- ${cat.name}: [${selected.value > 0 ? '+' : ''}${selected.value} pts] ${text}\n`;
+                } else {
+                    report += `- ${cat.name}: [Not Evaluated]\n`;
                 }
-            } catch (e) {
-                statusDisplay.innerText = "Connecting...";
-                statusDisplay.className = "status-banner";
-            }
-        }
-
-        async function fetchFromCloud() {
-            try {
-                const res = await fetch(CLOUD_URL);
-                if (res.ok) {
-                    const txt = await res.text();
-                    if (txt && txt.trim() !== "") {
-                        const cloudData = JSON.parse(txt);
-                        if (cloudData && (cloudData.tasks || cloudData.habits)) {
-                            dataStore = cloudData;
-                            renderCalendar();
-                            renderTasks();
-                            renderHabits();
-                        }
-                    }
-                    statusDisplay.innerText = "❤️ Connected & Synced";
-                    statusDisplay.className = "status-banner online";
-                }
-            } catch (e) {
-                statusDisplay.innerText = "Searching for sync...";
-                statusDisplay.className = "status-banner";
-            }
-        }
-
-        function formatDateString(year, month, day) {
-            return `${year}-${String(month + 1).padStart(2, '0')}-${String(day).padStart(2, '0')}`;
-        }
-
-        // --- Canvas Rendering Engines ---
-        function renderCalendar() {
-            const year = currentDate.getFullYear();
-            const month = currentDate.getMonth();
-            monthYearLabel.innerText = `${months[month]} ${year}`;
-
-            const weekdays = calendarMatrix.querySelectorAll('.weekday');
-            calendarMatrix.innerHTML = '';
-            weekdays.forEach(day => calendarMatrix.appendChild(day));
-
-            const firstDayIndex = new Date(year, month, 1).getDay();
-            const totalDays = new Date(year, month + 1, 0).getDate();
-            const today = new Date();
-
-            for (let i = 0; i < firstDayIndex; i++) {
-                const emptyDiv = document.createElement('div');
-                emptyDiv.classList.add('calendar-day', 'empty');
-                calendarMatrix.appendChild(emptyDiv);
-            }
-
-            for (let day = 1; day <= totalDays; day++) {
-                const dayDiv = document.createElement('div');
-                dayDiv.classList.add('calendar-day');
-                const dateStr = formatDateString(year, month, day);
-                dayDiv.dataset.date = dateStr;
-
-                if (today.getDate() === day && today.getMonth() === month && today.getFullYear() === year) dayDiv.classList.add('today');
-                if (selectedDateStr === dateStr) dayDiv.classList.add('selected');
-
-                const numSpan = document.createElement('span');
-                numSpan.classList.add('day-number');
-                numSpan.innerText = day;
-                dayDiv.appendChild(numSpan);
-
-                const badgesDiv = document.createElement('div');
-                badgesDiv.classList.add('day-badges');
-                const dayTasks = dataStore.tasks[dateStr] || [];
-                if (dayTasks.length > 0) {
-                    const hasPending = dayTasks.some(t => !t.completed);
-                    const badge = document.createElement('span');
-                    badge.classList.add('badge', hasPending ? 'task' : 'done');
-                    badgesDiv.appendChild(badge);
-                }
-                dayDiv.appendChild(badgesDiv);
-
-                dayDiv.addEventListener('click', () => selectDate(dateStr));
-                calendarMatrix.appendChild(dayDiv);
-            }
-        }
-
-        function selectDate(dateStr) {
-            selectedDateStr = dateStr;
-            document.querySelectorAll('.calendar-day').forEach(node => {
-                node.classList.remove('selected');
-                if(node.dataset.date === dateStr) node.classList.add('selected');
             });
 
-            const [y, m, d] = dateStr.split('-');
-            focusedDateLabel.innerText = `Plans: ${months[parseInt(m)-1]} ${parseInt(d)}, ${y}`;
-            toggleFormVisibility(true);
-            renderTasks();
+            document.getElementById('reportText').value = report;
+            document.getElementById('reportModal').style.display = 'flex';
         }
 
-        function renderTasks() {
-            tasksContainer.innerHTML = '';
-            if (!selectedDateStr) return;
-            const dayTasks = dataStore.tasks[selectedDateStr] || [];
-
-            if (dayTasks.length === 0) {
-                tasksContainer.innerHTML = `<p style="color: var(--text-muted); font-size: 0.9rem;">No plans written down for this day.</p>`;
-                return;
-            }
-
-            dayTasks.forEach(task => {
-                const item = document.createElement('div');
-                item.classList.add('task-item');
-                item.innerHTML = `
-                    <div class="task-content">
-                        <input type="checkbox" class="checkbox" ${task.completed ? 'checked' : ''}>
-                        <span class="task-text ${task.completed ? 'completed' : ''}">
-                            <span class="task-user">@${task.user}:</span>${task.text}
-                        </span>
-                    </div>
-                    <button class="btn-delete">✕</button>
-                `;
-
-                item.querySelector('.checkbox').addEventListener('change', async () => {
-                    task.completed = !task.completed;
-                    await pushToCloud();
-                    renderTasks();
-                    renderCalendar();
-                });
-
-                item.querySelector('.btn-delete').addEventListener('click', async () => {
-                    dataStore.tasks[selectedDateStr] = dayTasks.filter(t => t.id !== task.id);
-                    if(dataStore.tasks[selectedDateStr].length === 0) delete dataStore.tasks[selectedDateStr];
-                    await pushToCloud();
-                    renderTasks();
-                    renderCalendar();
-                });
-                tasksContainer.appendChild(item);
-            });
+        function copyReport() {
+            const reportText = document.getElementById('reportText');
+            reportText.select();
+            document.execCommand('copy');
+            alert('Report copied to clipboard!');
         }
 
-        function renderHabits() {
-            habitsContainer.innerHTML = '';
-            const todayStr = formatDateString(new Date().getFullYear(), new Date().getMonth(), new Date().getDate());
-
-            if (!dataStore.habits || dataStore.habits.length === 0) {
-                habitsContainer.innerHTML = `<p style="color: var(--text-muted); font-size: 0.9rem;">No tracking routines set up yet.</p>`;
-                return;
-            }
-
-            dataStore.habits.forEach(habit => {
-                const item = document.createElement('div');
-                item.classList.add('habit-item');
-                const isCompletedToday = habit.lastCompleted === todayStr;
-
-                item.innerHTML = `
-                    <div class="habit-info">
-                        <span class="habit-name">${habit.name}</span>
-                        <span class="habit-author">Added by: ${habit.user}</span>
-                        <span class="habit-streak">⚡ Streak: ${habit.streak} days</span>
-                    </div>
-                    <div class="habit-actions">
-                        <button class="btn-check ${isCompletedToday ? 'completed' : ''}">
-                            ${isCompletedToday ? 'Done' : 'Check'}
-                        </button>
-                        <button class="btn-delete">✕</button>
-                    </div>
-                `;
-
-                item.querySelector('.btn-check').addEventListener('click', async () => {
-                    if (!isCompletedToday) {
-                        const yesterdayStr = formatDateString(new Date().getFullYear(), new Date().getMonth(), new Date().getDate() - 1);
-                        if (habit.lastCompleted === yesterdayStr) habit.streak += 1;
-                        else if (habit.lastCompleted !== todayStr) habit.streak = 1;
-                        habit.lastCompleted = todayStr;
-                    } else {
-                        habit.streak = Math.max(0, habit.streak - 1);
-                        habit.lastCompleted = "";
-                    }
-                    await pushToCloud();
-                    renderHabits();
-                });
-
-                item.querySelector('.btn-delete').addEventListener('click', async () => {
-                    dataStore.habits = dataStore.habits.filter(h => h.id !== habit.id);
-                    await pushToCloud();
-                    renderHabits();
-                });
-                habitsContainer.appendChild(item);
-            });
+        function closeModal() {
+            document.getElementById('reportModal').style.display = 'none';
         }
-
-        // --- Profile Input Tracker Listener ---
-        userInput.addEventListener('input', () => {
-            userName = userInput.value.trim();
-            localStorage.setItem('ultra_sync_name_v3', userName);
-            toggleFormVisibility(userName !== "");
-            renderTasks();
-            renderHabits();
-        });
-
-        // --- Interaction Form Triggers ---
-        document.getElementById('add-task-btn').addEventListener('click', async () => {
-            const taskInput = document.getElementById('new-task-input');
-            const text = taskInput.value.trim();
-            if (!text || !selectedDateStr || !userName) return;
-
-            if (!dataStore.tasks) dataStore.tasks = {};
-            if (!dataStore.tasks[selectedDateStr]) dataStore.tasks[selectedDateStr] = [];
-
-            dataStore.tasks[selectedDateStr].push({
-                id: Date.now(),
-                text: text,
-                user: userName,
-                completed: false
-            });
-
-            taskInput.value = '';
-            await pushToCloud();
-            renderTasks();
-            renderCalendar();
-        });
-
-        document.getElementById('add-habit-btn').addEventListener('click', async () => {
-            const habitInput = document.getElementById('new-habit-input');
-            const name = habitInput.value.trim();
-            if (!name || !userName) return;
-
-            if(!dataStore.habits) dataStore.habits = [];
-            dataStore.habits.push({
-                id: Date.now(),
-                name: name,
-                user: userName,
-                streak: 0,
-                lastCompleted: ""
-            });
-
-            habitInput.value = '';
-            await pushToCloud();
-            renderHabits();
-        });
-
-        document.getElementById('prev-month-btn').addEventListener('click', () => { currentDate.setMonth(currentDate.getMonth() - 1); renderCalendar(); });
-        document.getElementById('next-month-btn').addEventListener('click', () => { currentDate.setMonth(currentDate.getMonth() + 1); renderCalendar(); });
-        document.getElementById('today-btn').addEventListener('click', () => {
-            currentDate = new Date();
-            selectDate(formatDateString(currentDate.getFullYear(), currentDate.getMonth(), currentDate.getDate()));
-            renderCalendar();
-        });
-
-        document.getElementById('new-task-input').addEventListener('keypress', (e) => { if (e.key === 'Enter') document.getElementById('add-task-btn').click(); });
-        document.getElementById('new-habit-input').addEventListener('keypress', (e) => { if (e.key === 'Enter') document.getElementById('add-habit-btn').click(); });
-
-        // --- Core Startup Engine ---
-        renderCalendar();
-        const initialTodayStr = formatDateString(currentDate.getFullYear(), currentDate.getMonth(), currentDate.getDate());
-        selectDate(initialTodayStr);
-
-        // Run download instantly 
-        fetchFromCloud();
-        
-        // Auto background data pulse download check loop execution every 5 seconds
-        setInterval(fetchFromCloud, 5000);
     </script>
 </body>
+</html>
 </html>
